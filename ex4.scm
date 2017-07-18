@@ -28,8 +28,12 @@
   (if (equal? (modulo (stream-car L) num) '0) (sieve num (stream-cdr L))
       (stream-cons (stream-car L) (sieve num (stream-cdr L)))
       )))
+
 (define primes (lambda (n L)
-))
+  (if (<= n 0) '()
+      (cons (stream-car L) (primes (- n 1) (sieve (stream-car L) L) ) )
+      )))
 
 (head 5 (numbers))
 (head 10 (sieve 2 (numbers)))
+(primes 50 (numbers))
