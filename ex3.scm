@@ -64,18 +64,13 @@
   ); lambda(l xs)
 )
 
+;return non-zero-list
 (define (non-zero? s)
-  (cond ((null? s) #f)
-        ((zero? s) #f)
-        (else #t)
-  )
-)
-(define (filter pred ls)
-  (cond ((null? ls) '())
-        ((pred (car ls))
-         (cons (car ls) (filter pred (cdr ls)))
-        )
-        (else (filter pred (cdr ls)))
+  (cond ((null? s) '())
+        ((pair? s) (list (apply append(map non-zero? s))))
+        ((equal? s '0) '())
+        ((number? s) (list s))
+        (else (list s))
   )
 )
 
@@ -96,7 +91,13 @@
 )
 (define simple*
   (lambda (l nzl)
-    '()
+    (let ( (p (car l)) (q (cadr l)) )
+      (cond ((or (equal? p '0) (equal? q '0) )  '0)
+            ((equal? p '1)  (list q))
+            ((equal? q '1)  (list p))
+            (else (list '* l))
+      )
+    )
   );lambda
 )
 (define simple**
@@ -108,7 +109,7 @@
   (lambda (l)
     (cond ((number? l) '() )
           ((pair? l);多項式
-           (let ((o (car l)) (nzl (filter non-zero? (cdr l) )))
+           (let ((o (car l)) (nzl (apply append (map non-zero? (cdr l) ))))
              (cond ((equal? o '+)  (simple+ (cdr l) nzl ) )
                    ((equal? o '-)  (simple- (cdr l) nzl) )
                    ((equal? o '*)  (simple* (cdr l) nzl) )
