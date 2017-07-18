@@ -135,5 +135,6 @@
 (diff2 'y 'x)
 (diff2 '(* x y) 'x)
 ;kadai-3-4 TODO
+(simple '(- 0 (* 1 (+ 0 1 2 3)) (- 0 3 4 5) (* 1 x) ))
 (simple (diff '(+ x 3)))
 (simple (diff '(+ (** x 2) (* 4 x) 5))) 
