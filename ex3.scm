@@ -65,55 +65,68 @@
 )
 
 ;return non-zero-list
-(define (non-zero? s)
-  (cond ((null? s) '())
-        ((pair? s) (list (apply append(map non-zero? s))))
-        ((equal? s '0) '())
-        ((number? s) (list s))
-        (else (list s))
-  )
+(define non-zero
+  (lambda (l)
+    (cond ((null? l) '())
+          ((pair? l)
+             (cond ((equal? (car l) 0) (non-zero (cdr l)))
+                   (else (cons (car l) (non-zero (cdr l))))
+             )
+          )
+    )
+  );lambda
 )
 
 (define simple+
-  (lambda (l nzl)
-    (cond ((null? nzl) '0)
-          ((null? (cdr nzl)) (car nzl))
-          (else (cons '+ nzl))
+  (lambda (l)
+    (let ((nzl (non-zero l)) )
+       (cond ((null? nzl) '0)
+             ((null? (cdr nzl)) (car nzl))
+             (else (cons '+ nzl))
+       )
     )
   );lambda
 )
 (define simple-
-  (lambda (l nzl)
-    (cond ((null? nzl) (car l))
-          (else (cons '- (car l)))
+  (lambda (l)
+    (let ((nzl (non-zero (cdr l))) )
+       (cond ((null? nzl) (car l))
+             (else (cons '- (cons (car l) nzl)))
+       )
     )
   );lambda
 )
 (define simple*
-  (lambda (l nzl)
+  (lambda (l)
     (let ( (p (car l)) (q (cadr l)) )
-      (cond ((or (equal? p '0) (equal? q '0) )  '0)
-            ((equal? p '1)  (list q))
-            ((equal? q '1)  (list p))
-            (else (list '* l))
+      (cond ((or (equal? p 0) (equal? q 0) )  0)
+            ((equal? p 1) q)
+            ((equal? q 1) p)
+            (else (cons '* l))
       )
     )
   );lambda
 )
 (define simple**
-  (lambda (l nzl)
-    '()
+  (lambda (l)
+    (let ((p (car l)) (q (cadr l)))
+      (cond ((equal? q 0) 1)
+            ((equal? q 1) p)
+            (else (cons '** l))
+      )
+    )
   );lambda
 )
 (define simple
   (lambda (l)
-    (cond ((number? l) '() )
+    (cond ((number? l) l)
+          ((symbol? l) l);記号
           ((pair? l);多項式
-           (let ((o (car l)) (nzl (apply append (map non-zero? (cdr l) ))))
-             (cond ((equal? o '+)  (simple+ (cdr l) nzl ) )
-                   ((equal? o '-)  (simple- (cdr l) nzl) )
-                   ((equal? o '*)  (simple* (cdr l) nzl) )
-                   ((equal? o '**) (simple** (cdr l) nzl) )
+           (let ((o (car l)) (ls (map simple (cdr l) )) )
+             (cond ((equal? o '+)  (simple+ ls) )
+                   ((equal? o '-)  (simple- ls) )
+                   ((equal? o '*)  (simple* ls) )
+                   ((equal? o '**) (simple** ls) )
                    );cond
              )
           );pair
@@ -135,6 +148,7 @@
 (diff2 'y 'x)
 (diff2 '(* x y) 'x)
 ;kadai-3-4 TODO
-(simple '(- 0 (* 1 (+ 0 1 2 3)) (- 0 3 4 5) (* 1 x) ))
+(simple '(+ (- 0 (* (** x 0) (+ 0 1))) (- (- 0 3) (* 1 x)) ))
 (simple (diff '(+ x 3)))
+(simple '(+ (* 2 (* 1 (** x 2))) (- (+ (* 4 1) (* 0 x)) 0)))
 (simple (diff '(+ (** x 2) (* 4 x) 5))) 
