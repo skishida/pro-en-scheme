@@ -28,8 +28,8 @@
           ((equal? l d) '1 );係数1,1次式 かつ 変数=微分対象
           ((pair? l);多項式
            (let ((o (car l)))
-             (cond ((equal? o '+)  (cons '+ (map diff2 (cdr l) d)) )
-                   ((equal? o '-)  (cons '- (map diff2 (cdr l) d)) )
+             (cond ((equal? o '+)  (cons '+ (map (lambda (ls) (diff2 ls d)) (cdr l) )))
+                   ((equal? o '-)  (cons '- (map (lambda (ls) (diff2 ls d)) (cdr l) )) )
                    ((equal? o '*)  (list '+ 
                                          (list '* (cadr l) (diff2 (caddr l) d) ) 
                                          (list '* (diff2 (cadr l) d) (caddr l) ) 
@@ -134,7 +134,7 @@
     );cond
   );lambda
 )
-    
+
 ;kadai-3-1
 (diff 'x)
 (diff '(+ x 5))
@@ -147,8 +147,12 @@
 (diff2 'x 'x)
 (diff2 'y 'x)
 (diff2 '(* x y) 'x)
+(diff2 '(* (* x 2) y) 'x)
+(diff2 '(- x y) 'x)
+(diff2 '(+ (** x 2) (** y 2)) 'y)
 ;kadai-3-4 TODO
+(simple (diff2 '(* (* x 2) y) 'x))
 (simple '(+ (- 0 (* (** x 0) (+ 0 1))) (- (- 0 3) (* 1 x)) ))
 (simple (diff '(+ x 3)))
-(simple '(+ (* 2 (* 1 (** x 2))) (- (+ (* 4 1) (* 0 x)) 0)))
+(simple '(+ (* 1 (* 7 (** x 0))) (- (+ (* 0 x) (* 3 x)) 0)))
 (simple (diff '(+ (** x 2) (* 4 x) 5))) 
